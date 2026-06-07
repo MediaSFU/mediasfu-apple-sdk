@@ -1,6 +1,8 @@
 import Foundation
 
-#if canImport(shared)
+#if canImport(MediaSFUSDK)
+import MediaSFUSDK
+#elseif canImport(shared)
 import shared
 #endif
 
@@ -10,7 +12,7 @@ import MediaSFUMediasoupClient
 
 public enum MediaSFUKmpBridgeInstaller {
     public static func isKmpModuleAvailable() -> Bool {
-        #if canImport(shared)
+        #if canImport(MediaSFUSDK) || canImport(shared)
         return true
         #else
         return false
@@ -19,7 +21,10 @@ public enum MediaSFUKmpBridgeInstaller {
 
     @discardableResult
     public static func installBridgeIfSupported(_ bridge: MediaSFUNativeMediasoupBridge) -> Bool {
-        #if canImport(shared)
+        #if canImport(MediaSFUSDK)
+        IosMediasoupBridgeKt.installIosNativeMediasoupBridge(bridge: SharedBridgeAdapter(bridge: bridge))
+        return true
+        #elseif canImport(shared)
         SharedKt.installIosNativeMediasoupBridge(bridge: SharedBridgeAdapter(bridge: bridge))
         return true
         #else
@@ -47,7 +52,7 @@ public enum MediaSFUKmpBridgeInstaller {
     #endif
 
     public static func bridgeInstallModeDescription() -> String {
-        #if canImport(shared)
+        #if canImport(MediaSFUSDK) || canImport(shared)
         return "KMP bridge available: install a placeholder bridge for scaffolding or a device-backed bridge for real mediasoup integration."
         #else
         return "KMP bridge unavailable: the Swift package can build, but bridge installation requires the generated shared framework."
@@ -55,7 +60,7 @@ public enum MediaSFUKmpBridgeInstaller {
     }
 }
 
-#if canImport(shared) && canImport(WebRTC)
+#if (canImport(MediaSFUSDK) || canImport(shared)) && canImport(WebRTC)
 import WebRTC
 
 final class SharedBridgeAdapter: SharedIosNativeLoadableMediasoupBridge {
