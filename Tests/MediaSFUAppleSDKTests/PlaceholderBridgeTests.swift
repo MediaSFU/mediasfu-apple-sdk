@@ -167,6 +167,8 @@ final class PlaceholderBridgeTests: XCTestCase {
         let producer = send.produce(
             track: FakeTrack(),
             encodingsJson: nil,
+            codecOptionsJson: nil,
+            codecJson: nil,
             appDataJson: try MediaSFUBridgeJson.encode(["source": "mic"])
         )
         producedId = producer.id
@@ -225,6 +227,8 @@ final class PlaceholderBridgeTests: XCTestCase {
         let producer = try sendAdapter.produce(
             track: FakeTrack(),
             encodingsJson: "{\"active\":true}",
+            codecOptionsJson: nil,
+            codecJson: nil,
             appDataJson: "{\"source\":\"screen\"}"
         )
         let consumer = try recvAdapter.consume(
@@ -279,6 +283,8 @@ final class PlaceholderBridgeTests: XCTestCase {
         let producer = try send.produce(
             track: FakeTrack(),
             encodingsJson: "{\"maxBitrate\":1200000}",
+            codecOptionsJson: nil,
+            codecJson: nil,
             appDataJson: "{\"source\":\"camera\"}"
         )
         let consumer = try recv.consume(
@@ -335,6 +341,8 @@ final class PlaceholderBridgeTests: XCTestCase {
         let producer = try send.produce(
             track: FakeTrack(),
             encodingsJson: "{\"active\":true}",
+            codecOptionsJson: nil,
+            codecJson: nil,
             appDataJson: "{\"source\":\"screen\"}"
         )
         let consumer = try recv.consume(
@@ -381,6 +389,8 @@ final class PlaceholderBridgeTests: XCTestCase {
         let producer = try send.produce(
             track: FakeTrack(),
             encodingsJson: "{\"active\":true}",
+            codecOptionsJson: nil,
+            codecJson: nil,
             appDataJson: "{\"source\":\"camera\"}"
         )
         producedId = producer.id
@@ -446,6 +456,8 @@ final class PlaceholderBridgeTests: XCTestCase {
         let producer = try send.produce(
             track: FakeTrack(),
             encodingsJson: "{\"scaleResolutionDownBy\":2}",
+            codecOptionsJson: nil,
+            codecJson: nil,
             appDataJson: "{\"source\":\"screen\"}"
         )
 
@@ -483,7 +495,13 @@ final class PlaceholderBridgeTests: XCTestCase {
             kind: "audio",
             rtpParametersJson: "{\"mid\":\"21\"}"
         )
-        let producer = try send.produce(track: FakeTrack(), encodingsJson: nil, appDataJson: nil)
+        let producer = try send.produce(
+            track: FakeTrack(),
+            encodingsJson: nil,
+            codecOptionsJson: nil,
+            codecJson: nil,
+            appDataJson: nil
+        )
         try producer.replaceTrack(FakeTrack())
         producer.pause()
         producer.resume()
@@ -515,7 +533,13 @@ final class PlaceholderBridgeTests: XCTestCase {
         XCTAssertEqual(send.id, "concrete-send")
         XCTAssertEqual(recv.id, "concrete-recv")
 
-        let producer = try send.produce(track: FakeTrack(), encodingsJson: nil, appDataJson: "{\"source\":\"camera\"}")
+        let producer = try send.produce(
+            track: FakeTrack(),
+            encodingsJson: nil,
+            codecOptionsJson: nil,
+            codecJson: nil,
+            appDataJson: "{\"source\":\"camera\"}"
+        )
         _ = try recv.consume(id: "concrete-consumer", producerId: "upstream-producer", kind: "video", rtpParametersJson: "{\"mid\":\"31\"}")
         try producer.replaceTrack(FakeTrack())
 
@@ -592,10 +616,14 @@ private final class FakeSendTransportAdapter: FakeBaseTransportAdapter, MediaSFU
     func produce(
         track: MediaSFUNativeTrack,
         encodingsJson: String?,
+        codecOptionsJson: String?,
+        codecJson: String?,
         appDataJson: String?
     ) throws -> MediaSFUProducerAdapter {
         lastProducedTrack = track
         lastProducedEncodingsJson = encodingsJson
+        _ = codecOptionsJson
+        _ = codecJson
         lastProducedAppDataJson = appDataJson
 
         var producerId = "producer-adapter"
@@ -871,9 +899,17 @@ private final class FakeLibmediasoupSendTransport: FakeLibmediasoupBaseTransport
         produceListener = listener
     }
 
-    func produce(track: MediaSFUNativeTrack, encodingsJson: String?, appDataJson: String?) throws -> MediaSFULibmediasoupProducer {
+    func produce(
+        track: MediaSFUNativeTrack,
+        encodingsJson: String?,
+        codecOptionsJson: String?,
+        codecJson: String?,
+        appDataJson: String?
+    ) throws -> MediaSFULibmediasoupProducer {
         _ = track
         lastEncodingsJson = encodingsJson
+        _ = codecOptionsJson
+        _ = codecJson
         lastAppDataJson = appDataJson
         return FakeLibmediasoupProducer(id: "lib-producer")
     }
