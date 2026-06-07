@@ -12,6 +12,10 @@ Apple consumers should not need to rebuild that Kotlin repo themselves. The expe
 
 Helpers in this repo:
 
+- `Package.swift`
+  - public SwiftPM manifest that points at the hosted prebuilt `MediaSFUSDK` release asset
+- `Package.source.swift`
+  - maintainer-only source manifest for local validation when working on the Apple bridge package itself
 - `scripts/prepare_kmp_binary_dist.sh`
   - builds `MediaSFUSDK` release frameworks from the sibling `mediasfu-sdk-kotlin` checkout
   - supports `MEDIA_SFU_SIMULATOR_BUILD_TYPE=debug` when a usable simulator slice is needed without waiting on a release-simulator rebuild

@@ -4,7 +4,8 @@ import PackageDescription
 let package = Package(
     name: "MediaSFUAppleSDK",
     platforms: [
-        .iOS(.v15)
+        .iOS(.v15),
+        .macOS(.v13)
     ],
     products: [
         .library(
@@ -14,18 +15,17 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "0.1.2")
+        .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "0.1.3")
     ],
     targets: [
-        .binaryTarget(
-            name: "MediaSFUSDKBinary",
-            url: "https://github.com/MediaSFU/mediasfu-apple-sdk/releases/download/0.1.3/MediaSFUSDK-1.0.3.xcframework.zip",
-            checksum: "31e42ecfa5c397d7f307081ae7840061c4687dbd79d8dcd48cb928a5b7ce3da4"
-        ),
         .target(
             name: "MediaSFUAppleSDK",
             dependencies: [
-                "MediaSFUSDKBinary",
+                .product(
+                    name: "WebRTCBinary",
+                    package: "mediasfu-mediasoup-client-apple",
+                    condition: .when(platforms: [.iOS])
+                ),
                 .product(
                     name: "MediaSFUMediasoupClient",
                     package: "mediasfu-mediasoup-client-apple",

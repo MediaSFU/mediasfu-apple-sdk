@@ -60,7 +60,7 @@ public enum MediaSFUKmpBridgeInstaller {
     }
 }
 
-#if (canImport(MediaSFUSDK) || canImport(shared)) && canImport(WebRTC)
+#if canImport(MediaSFUSDK) || canImport(shared)
 import WebRTC
 
 final class SharedBridgeAdapter: SharedIosNativeLoadableMediasoupBridge {

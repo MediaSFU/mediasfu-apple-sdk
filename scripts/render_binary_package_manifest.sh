@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 URL="${1:-}"
 CHECKSUM="${2:-}"
-OUTPUT="${3:-$REPO_ROOT/Package.binary.swift}"
+OUTPUT="${3:-$REPO_ROOT/Package.swift}"
 
 if [ -z "$URL" ] || [ -z "$CHECKSUM" ]; then
   echo "Usage: $0 <artifact-url> <checksum> [output-file]" >&2
@@ -29,7 +29,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "0.1.2")
+        .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "0.1.3")
     ],
     targets: [
         .binaryTarget(
@@ -41,6 +41,11 @@ let package = Package(
             name: "MediaSFUAppleSDK",
             dependencies: [
                 "MediaSFUSDKBinary",
+                .product(
+                    name: "WebRTCBinary",
+                    package: "mediasfu-mediasoup-client-apple",
+                    condition: .when(platforms: [.iOS])
+                ),
                 .product(
                     name: "MediaSFUMediasoupClient",
                     package: "mediasfu-mediasoup-client-apple",
