@@ -15,7 +15,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "1.0.0")
+        .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "0.1.0")
     ],
     targets: [
         .target(
