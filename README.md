@@ -85,8 +85,6 @@ Add the Swift Package URL to your Xcode project dependencies:
 https://github.com/MediaSFU/mediasfu-apple-sdk.git
 ```
 
-This package ships the prebuilt `MediaSFUSDK` Apple binary for the current release, so Swift consumers do not need to rebuild `mediasfu-sdk-kotlin` locally.
-
 ### 2. Configure Permissions (`Info.plist`)
 
 Ensure your app requests camera and mic permissions:
