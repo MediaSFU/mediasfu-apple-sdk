@@ -14,6 +14,8 @@ Helpers in this repo:
 
 - `scripts/prepare_kmp_binary_dist.sh`
   - builds `MediaSFUSDK` release frameworks from the sibling `mediasfu-sdk-kotlin` checkout
+  - supports `MEDIA_SFU_SIMULATOR_BUILD_TYPE=debug` when a usable simulator slice is needed without waiting on a release-simulator rebuild
+  - supports `MEDIA_SFU_SKIP_DEVICE_BUILD=1` / `MEDIA_SFU_SKIP_SIMULATOR_BUILD=1` to reuse already-built framework slices during packaging
   - creates `Artifacts/MediaSFUSDK.xcframework`
   - zips it and computes the SwiftPM checksum
 - `scripts/render_binary_package_manifest.sh`
