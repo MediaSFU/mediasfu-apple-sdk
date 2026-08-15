@@ -1,8 +1,8 @@
 # MediaSFU Apple SDK Integration & Deep-Dive Usage Guide
 
-The **`mediasfu-apple-sdk`** package is the official integration layer for native iOS, iPadOS, and macOS Swift applications. It connects your native Apple client to the high-level **MediaSFU** room, socket, and media orchestration engine.
+The **`mediasfu-apple-sdk`** package is the official integration layer for native iOS and iPadOS Swift applications. It connects your Apple client to the high-level **MediaSFU** room, socket, and media orchestration engine.
 
-This guide provides a comprehensive walkthrough of the SDK's integration pathways, configuration options, programmatic control APIs, and custom rendering interfaces.
+Use this guide when you want to add the hosted MediaSFU room UI to an app, or when you need lower-level programmatic control after the room is mounted.
 
 ---
 
@@ -62,7 +62,7 @@ The primary entry point for configuring a MediaSFU session is the `MediaSFUIosLa
 | :--- | :--- | :--- | :--- |
 | `apiUserName` | `String` | Yes (Cloud) | Your MediaSFU account username. Get this from the [MediaSFU Dashboard](https://mediasfu.com). |
 | `apiKey` | `String` | Yes (Cloud) | Your MediaSFU application API key. Used to sign and validate session requests. |
-| `localLink` | `String` | Optional | Set this **only** if you are connecting to a self-hosted **MediaSFU Community Edition (CE)** server (e.g., `https://your-ce-instance.example.com`). Leave empty for MediaSFU Cloud. |
+| `localLink` | `String` | Optional | Set this **only** when connecting to a self-hosted **MediaSFU Open / Community Edition (CE)** server, e.g. `https://your-ce-instance.example.com`. Leave empty for MediaSFU Cloud. |
 | `connectMediaSFU` | `Bool` | Yes | Set to `true` to establish signaling connections with MediaSFU servers. Set to `false` for offline UI testing/previews. |
 
 ### Room Configuration & Actions
@@ -102,15 +102,16 @@ struct MediaSFURoomView: UIViewControllerRepresentable {
     var roomName: String = ""
     var localLink: String? = nil
     var autoProceed: Bool = true
+    private let nativeDevice = MSCDevice()
     
     func makeUIViewController(context: Context) -> UIViewController {
         let bridge = MediaSFUIosHostBridge()
         let config = bridge.makeLaunchConfig()
         
-        // Credentials
+        // MediaSFU Cloud credentials.
         config.apiUserName = apiUserName
         config.apiKey = apiKey
-        config.localLink = localLink ?? ""
+        config.localLink = localLink ?? "" // Leave empty for MediaSFU Cloud.
         config.connectMediaSFU = true
         
         // Room Identity
@@ -122,6 +123,10 @@ struct MediaSFURoomView: UIViewControllerRepresentable {
         // Moderation & Flow
         config.islevel = action == "create" ? "2" : "0"
         config.autoProceed = autoProceed
+
+        // Required for real media publishing/receiving.
+        // Keep this device alive while the room is active.
+        MediaSFUKmpBridgeInstaller.installMediaSFUMediasoupClientBridgeIfSupported(device: nativeDevice)
         
         return bridge.makeHostViewController(config: config)
     }
@@ -160,6 +165,7 @@ import UIKit
 import MediaSFUAppleSDK
 
 class MainMenuViewController: UIViewController {
+    private let nativeDevice = MSCDevice()
     
     func launchMediaSFURoom() {
         let bridge = MediaSFUIosHostBridge()
@@ -173,6 +179,8 @@ class MainMenuViewController: UIViewController {
         config.action = "create"
         config.eventType = "conference"
         config.autoProceed = false // Show pre-join setup screen
+
+        MediaSFUKmpBridgeInstaller.installMediaSFUMediasoupClientBridgeIfSupported(device: nativeDevice)
         
         let roomViewController = bridge.makeHostViewController(config: config)
         roomViewController.modalPresentationStyle = .fullScreen
