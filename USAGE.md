@@ -1,4 +1,4 @@
-# MediaSFU Apple SDK Integration & Deep-Dive Usage Guide
+# MediaSFU Apple SDK Integration and Usage Guide
 
 The **`mediasfu-apple-sdk`** package is the official integration layer for native iOS and iPadOS Swift applications. It connects your Apple client to the high-level **MediaSFU** room, socket, and media orchestration engine.
 
@@ -12,13 +12,8 @@ Use this guide when you want to add the hosted MediaSFU room UI to an app, or wh
 2. [Configuration Parameters Reference](#-configuration-parameters-reference)
 3. [Hosted UI Mode (SwiftUI & UIKit)](#-hosted-ui-mode-swiftui--uikit)
 4. [Headless Mode (Custom UI Integration)](#-headless-mode-custom-ui-integration)
-5. [Programmatic Media Controls (The Power API)](#-programmatic-media-controls-the-power-api)
+5. [Programmatic Media Controls](#-programmatic-media-controls)
 6. [Advanced Features & Room Moderation](#-advanced-features--room-moderation)
-   - [Event Types](#event-types)
-   - [Roles & Permissions](#roles--permissions)
-   - [Waiting Room & Access Control](#waiting-room--access-control)
-   - [Cloud Recording Control](#cloud-recording-control)
-   - [Polls & Engagement](#polls--engagement)
 7. [Custom Media Rendering (SwiftUI & UIKit)](#-custom-media-rendering-swiftui--uikit)
 8. [Troubleshooting & Support](#-troubleshooting--support)
 
@@ -60,8 +55,8 @@ The primary entry point for configuring a MediaSFU session is the `MediaSFUIosLa
 
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
-| `apiUserName` | `String` | Yes | Your account username in the standard Cloud flow. For a backend room handoff, use the non-secret placeholder `"dummyUsr"`; the SDK replaces it before the socket connection. |
-| `apiKey` | `String` | Yes | Your account API key in the standard Cloud flow. For a backend room handoff, use a shape-valid non-secret placeholder such as `String(repeating: "0", count: 64)` and keep the real key on the server. |
+| `apiUserName` | `String` | Yes | Your account username in the standard Cloud flow. For a backend room handoff, use the non-secret bootstrap value `"roomUser"`; the SDK replaces it before the socket connection. |
+| `apiKey` | `String` | Yes | Your account API key in the standard Cloud flow. For a backend room handoff, use a shape-valid non-secret bootstrap value such as `String(repeating: "0", count: 64)` and keep the real key on the server. |
 | `localLink` | `String` | Optional | Set this **only** when connecting to a self-hosted **MediaSFU Open / Community Edition (CE)** server, e.g. `https://your-ce-instance.example.com`. Leave empty for MediaSFU Cloud. |
 | `connectMediaSFU` | `Bool` | Yes | Set to `true` to establish signaling connections with MediaSFU servers. Set to `false` for offline UI testing/previews. |
 
@@ -79,7 +74,7 @@ The primary entry point for configuring a MediaSFU session is the `MediaSFUIosLa
 | `capacity` | `Int` | `100` | The maximum allowed concurrent participants (for new rooms). |
 | `secureCode` | `String` | `""` | Optional passcode to restrict admin access when creating a room. |
 | `adminPasscode` | `String` | `""` | Passcode provided by a joining participant to request admin privileges. |
-| `islevel` | `String` | `"0"` | `"0"` for standard participant, `"2"` for admin/host. |
+| `islevel` | `String` | `"0"` | Participant level assigned by your application: `"0"` for listener/viewer, `"1"` for speaker/participant, or `"2"` for admin/host. |
 | `autoProceed` | `Bool` | `false` | `true` to skip the pre-join camera/mic check screen and join the room instantly. |
 
 ---
@@ -195,7 +190,9 @@ class MainMenuViewController: UIViewController {
 
 ## 🏗️ Headless Mode (Custom UI Integration)
 
-If you want to build a completely custom, branded UI, you can run the SDK in **Headless Mode** (`returnUI = false`). This allows you to leverage MediaSFU's robust WebRTC connection state management and Socket signaling while maintaining complete control over your views.
+For a custom app flow, set `autoProceed` to `true` and mount the returned host
+controller inside your own SwiftUI or UIKit interface. The controller owns the
+room, socket, and media lifecycle even when your app renders the visible controls.
 
 ### Reusing a backend create/join response
 
@@ -204,8 +201,8 @@ room-scoped values from that response to the native bridge and set
 `autoProceed` to `true`:
 
 ```swift
-// Shape-valid routing placeholders. These are not account credentials.
-config.apiUserName = "dummyUsr"
+// Non-secret bootstrap values used only until the room handoff is applied.
+config.apiUserName = "roomUser"
 config.apiKey = String(repeating: "0", count: 64)
 config.connectMediaSFU = true
 
@@ -217,7 +214,7 @@ config.userName = displayName
 config.autoProceed = true
 ```
 
-The placeholders select the no-UI pre-join path; they are not used to
+The bootstrap values satisfy launch validation; they are not used to
 authenticate the room. The SDK uses the returned `roomName` as the socket
 `apiUserName`, the returned `secret` as the socket `apiToken`, and `link` as the
 media node. It therefore does not issue a second create/join request with an
@@ -229,62 +226,36 @@ backend does not turn it into a self-hosted MediaSFU Open / CE connection. Leave
 `roomApiToken` and `roomLink` empty only when you intentionally want the SDK to
 perform the standard account-authenticated Cloud create/join flow itself.
 
-For a custom SwiftUI interface, keep the returned MediaSFU host controller
-mounted for the lifetime of the room. It may sit behind your opaque app surface
-with hit testing and accessibility disabled, but it must not be collapsed to a
-zero-sized view or removed from the hierarchy; its lifecycle runs the socket and
-media engine.
+Keep the returned MediaSFU host controller mounted for the lifetime of the room.
+It may sit behind an opaque app surface with hit testing and accessibility
+disabled, but it must retain non-zero bounds and remain in the view hierarchy.
+Use `latestLocalVideoTrack()` and `latestRemoteVideoTracks()` to bind native
+`RTCVideoTrack` objects to your custom renderers.
 
 ```swift
 import SwiftUI
 import MediaSFUAppleSDK
-import MediaSFUMediasoupClient
 
-class CustomRoomController: ObservableObject {
-    private var nativeDevice: MSCDevice?
-    private var mediaBridge: DeviceBackedMediasoupBridge?
-    
-    @Published var participants: [ParticipantInfo] = []
-    @Published var activeStreams: [RTCVideoTrack] = []
-    @Published var isMuted: Bool = false
-    @Published var isCameraOn: Bool = false
-    
-    func initializeRoomConnection() {
-        let nativeDevice = MSCDevice()
-        self.nativeDevice = nativeDevice
-        
-        let adapter = MediaSFUMediasoupClientBridgeFactory.makeInstallableAdapter(device: nativeDevice)
-        let bridge = DeviceBackedMediasoupBridge(device: adapter)
-        self.mediaBridge = bridge
-        
-        // Install media engine shim into KMP runtime
-        MediaSFUKmpBridgeInstaller.installBridgeIfSupported(bridge)
-        
-        // 1. Establish REST & Socket connections
-        // 2. Register observers for stream events
+struct RoomRuntimeView: UIViewControllerRepresentable {
+    let bridge: MediaSFUIosHostBridge
+    let config: MediaSFUIosLaunchConfig
+
+    func makeUIViewController(context: Context) -> UIViewController {
+        bridge.makeHostViewController(config: config)
     }
-    
-    func toggleAudio() {
-        // Trigger microphone state change
-        isMuted.toggle()
-    }
-    
-    func toggleVideo() {
-        // Trigger camera state change
-        isCameraOn.toggle()
-    }
+
+    func updateUIViewController(_ controller: UIViewController, context: Context) {}
 }
 ```
 
 ---
 
-## ⚡ Programmatic Media Controls (The Power API)
+## ⚡ Programmatic Media Controls
 
 Once a hosted room is actively presented, you can invoke media actions programmatically from your host Swift application using `MediaSFUIosHostBridge`:
 
 ```swift
-let bridge = MediaSFUIosHostBridge()
-// Present your room controller...
+// Use the same bridge instance that created the mounted room controller.
 
 // Toggle local microphone
 bridge.triggerToggleAudio()
@@ -295,79 +266,57 @@ bridge.triggerToggleVideo()
 // Start/Stop screen-share capture
 bridge.triggerToggleScreenShare()
 
-// Switch front/rear camera
-bridge.triggerSwitchCamera()
 ```
 
 > [!NOTE]
-> Programmatic triggers are queued and safely ignored if the room UI has not completed its initial connection handshake.
+> Each method returns `true` when the room accepted the action. A `false` result
+> means the room is not ready for that control yet.
 
 ---
 
 ## 🛡️ Advanced Features & Room Moderation
 
 ### Event Types
-MediaSFU configures layout and permission defaults based on the event profile:
+Set `eventType` when creating a room so the hosted UI and room policy use the
+matching profile:
 
-* **`"conference"`**: Standard multi-party meeting. All participants can unmute, share video, and initiate screen sharing.
-* **`"broadcast"`**: High-performance streaming mode. One host publishes video/audio, and all other participants receive the stream passively.
-* **`"webinar"`**: Moderated seminar model. Host and designated panelists can publish streams. Audience members can raise hands to request promotion.
-* **`"chat"`**: High-density text and audio communication. Video grids are disabled to save network resources.
+* **`"conference"`**: Multi-participant meeting.
+* **`"broadcast"`**: Host-led broadcast with an audience.
+* **`"webinar"`**: Moderated host, panelist, and attendee session.
+* **`"chat"`**: Chat-focused room.
 
 ### Roles & Permissions
-You can delegate responsibilities or restrict actions by adjusting participant levels:
+Use the participant level supplied by your application flow:
 
 ```swift
-// Host setup
-config.islevel = "2" // Level "2" = Full Admin / Host controls enabled
-config.secureCode = "my-secure-admin-passcode"
-
-// Standard Participant setup
-config.islevel = "0" // Level "0" = Participant role (no moderation controls)
+config.islevel = "0" // listener or viewer
+config.islevel = "1" // speaker or participant
+config.islevel = "2" // admin or host
 ```
 
-### Waiting Room & Access Control
-When Waiting Room moderation is enabled on the server, the host receives access requests dynamically:
+Room settings and the server remain authoritative. Do not assign host level from
+untrusted client input. For an admin join, provide the matching room passcode:
 
 ```swift
-// As the host, you can handle waiting room requests programmatically:
-func admitParticipant(id: String) {
-    // Emit 'allowUserIn' on the signaling transport
-}
-
-func denyParticipant(id: String) {
-    // Reject request
-}
+config.islevel = "2"
+config.adminPasscode = adminPasscode
 ```
 
-### Cloud Recording Control
-Start, pause, and stop cloud-side recordings with customized visual profiles:
+### Hosted moderation tools
+
+The hosted room UI provides waiting-room requests, participant controls,
+recording, polls, and other tools when they are enabled for the room and the
+current participant has permission. A custom shell can open supported hosted
+modals through the same bridge instance:
 
 ```swift
-// Trigger cloud recording options
-func startRoomRecording() {
-    let recordingOptions = [
-        "recordingType": "video",
-        "includeAudio": true,
-        "videoLayout": "grid",
-        "backgroundColor": "#0F172A" // Premium dark slate background
-    ]
-    // Emit start recording request
-}
+bridge.triggerShowModal(name: "waiting")
+bridge.triggerShowModal(name: "recording")
 ```
 
-### Polls & Engagement
-Create and vote on interactive polls:
-
-```swift
-// Host creates a poll
-func launchCustomPoll() {
-    let pollQuestion = "Which feature should we build next?"
-    let options = ["Virtual Backgrounds", "Noise Cancellation", "Custom Layouts"]
-    
-    // Publish poll data to participants
-}
-```
+Supported names are `media_settings`, `display_settings`, `recording`, `cohost`,
+`requests`, `waiting`, and `confirm_exit`. The method returns `false` when the
+room is not ready.
 
 ---
 
@@ -381,20 +330,31 @@ import WebRTC
 
 struct NativeVideoRenderer: UIViewRepresentable {
     let videoTrack: RTCVideoTrack
-    
+
+    final class Coordinator {
+        var track: RTCVideoTrack?
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator() }
+
     func makeUIView(context: Context) -> RTCMTLVideoView {
         let view = RTCMTLVideoView()
         view.videoContentMode = .scaleAspectFill
         view.clipsToBounds = true
+        context.coordinator.track = videoTrack
         videoTrack.add(view)
         return view
     }
-    
-    func updateUIView(_ uiView: RTCMTLVideoView, context: Context) {}
-    
-    static func dismantleUIView(_ uiView: RTCMTLVideoView, context: Context) {
-        // Prevent layout leaks by detaching the renderer
-        // when the participant leaves or cell is recycled
+
+    func updateUIView(_ view: RTCMTLVideoView, context: Context) {
+        guard context.coordinator.track !== videoTrack else { return }
+        context.coordinator.track?.remove(view)
+        context.coordinator.track = videoTrack
+        videoTrack.add(view)
+    }
+
+    static func dismantleUIView(_ view: RTCMTLVideoView, coordinator: Coordinator) {
+        coordinator.track?.remove(view)
     }
 }
 ```
@@ -413,4 +373,4 @@ struct NativeVideoRenderer: UIViewRepresentable {
 
 ### 3. Local Link Connection Failure
 * **Symptom**: Connection timeout when using `localLink` pointing to a self-hosted server.
-* **Fix**: iOS requires secure connections (`https`) for WebRTC. If you are self-hosting on local servers, ensure you supply a valid HTTPS endpoint with trusted certificates. If using self-signed development certificates, you must implement a custom `ServerCertificateValidationCallback` on your `MediaSfuClientOptions`.
+* **Fix**: Use an HTTPS endpoint with a certificate trusted by iOS and ensure the host satisfies your app's App Transport Security policy.

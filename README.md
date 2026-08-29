@@ -135,7 +135,7 @@ The iOS app receives only the room-scoped `roomName`, `secret`, and `link` from
 that backend response:
 
 ```swift
-config.apiUserName = "dummyUsr"
+config.apiUserName = "roomUser"
 config.apiKey = String(repeating: "0", count: 64)
 config.connectMediaSFU = true
 
@@ -147,15 +147,15 @@ config.roomLink = response.link
 config.autoProceed = true
 ```
 
-The two placeholder values are deliberately non-secret and only satisfy the
-pre-join configuration shape. Before the socket connection, the SDK replaces
-them with the room-scoped handoff: `roomName` becomes the socket username,
-`secret` becomes the socket token, and `link` selects the media node. The SDK
-does not make another account-authenticated create/join request.
+The first two values are non-secret bootstrap values used only for launch
+validation. Before the socket connection, the SDK applies the room-scoped
+handoff: `roomName` becomes the socket username, `secret` becomes the socket
+token, and `link` selects the media node. The SDK does not make another
+account-authenticated create/join request.
 
 Do not put a real account API key in an iOS app that uses this pattern. Keep it
-in the backend's private environment. Also leave `localLink` empty: a backend
-proxy for MediaSFU Cloud is not a self-hosted MediaSFU Open / CE instance.
+on your application server. Also leave `localLink` empty: an application backend
+for MediaSFU Cloud is not a self-hosted MediaSFU Open / CE instance.
 
 ---
 

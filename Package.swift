@@ -19,8 +19,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "MediaSFUSDKBinary",
-            url: "https://github.com/MediaSFU/mediasfu-apple-sdk/releases/download/0.1.5/MediaSFUSDK-1.0.4.xcframework.zip",
-            checksum: "cf15635870b207f44ef3bcd9bf3646d47694268d66220f9e2b2f68c949b0141a"
+            url: "https://github.com/MediaSFU/mediasfu-apple-sdk/releases/download/0.1.6/MediaSFUSDK-1.0.6.xcframework.zip",
+            checksum: "21622c822eea838286f840b2a8bafce693593f880e009d3e5592955da803b853"
         ),
         .target(
             name: "MediaSFUAppleSDK",
