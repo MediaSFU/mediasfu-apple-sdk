@@ -60,8 +60,8 @@ The primary entry point for configuring a MediaSFU session is the `MediaSFUIosLa
 
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
-| `apiUserName` | `String` | Standard Cloud flow | Your MediaSFU account username. Get this from the [MediaSFU Dashboard](https://mediasfu.com). A backend handoff does not require it in the client. |
-| `apiKey` | `String` | Standard Cloud flow | Your MediaSFU application API key. A backend handoff should keep this credential on the server. |
+| `apiUserName` | `String` | Yes | Your account username in the standard Cloud flow. For a backend room handoff, use the non-secret placeholder `"dummyUsr"`; the SDK replaces it before the socket connection. |
+| `apiKey` | `String` | Yes | Your account API key in the standard Cloud flow. For a backend room handoff, use a shape-valid non-secret placeholder such as `String(repeating: "0", count: 64)` and keep the real key on the server. |
 | `localLink` | `String` | Optional | Set this **only** when connecting to a self-hosted **MediaSFU Open / Community Edition (CE)** server, e.g. `https://your-ce-instance.example.com`. Leave empty for MediaSFU Cloud. |
 | `connectMediaSFU` | `Bool` | Yes | Set to `true` to establish signaling connections with MediaSFU servers. Set to `false` for offline UI testing/previews. |
 
@@ -199,10 +199,16 @@ If you want to build a completely custom, branded UI, you can run the SDK in **H
 
 ### Reusing a backend create/join response
 
-If your application server already creates or joins the room, pass the room-scoped
-values from that response to the native bridge and set `autoProceed` to `true`:
+If your application server already creates or joins the room, pass the
+room-scoped values from that response to the native bridge and set
+`autoProceed` to `true`:
 
 ```swift
+// Shape-valid routing placeholders. These are not account credentials.
+config.apiUserName = "dummyUsr"
+config.apiKey = String(repeating: "0", count: 64)
+config.connectMediaSFU = true
+
 config.action = "join"
 config.roomName = response.roomName
 config.roomApiToken = response.secret
@@ -211,12 +217,23 @@ config.userName = displayName
 config.autoProceed = true
 ```
 
-The SDK uses the returned `roomName` as the socket `apiUserName` and the returned
-`secret` as the socket `apiToken`. It then connects directly to the returned media
-node, so it does not issue a second create/join request with the account API key.
+The placeholders select the no-UI pre-join path; they are not used to
+authenticate the room. The SDK uses the returned `roomName` as the socket
+`apiUserName`, the returned `secret` as the socket `apiToken`, and `link` as the
+media node. It therefore does not issue a second create/join request with an
+account API key.
+
 Keep account credentials on your server when using this handoff pattern. Leave
-`roomApiToken` and `roomLink` empty when you want the SDK to perform the standard
-cloud create/join flow itself.
+`localLink` empty: proxying a managed Cloud room through your application
+backend does not turn it into a self-hosted MediaSFU Open / CE connection. Leave
+`roomApiToken` and `roomLink` empty only when you intentionally want the SDK to
+perform the standard account-authenticated Cloud create/join flow itself.
+
+For a custom SwiftUI interface, keep the returned MediaSFU host controller
+mounted for the lifetime of the room. It may sit behind your opaque app surface
+with hit testing and accessibility disabled, but it must not be collapsed to a
+zero-sized view or removed from the hierarchy; its lifecycle runs the socket and
+media engine.
 
 ```swift
 import SwiftUI

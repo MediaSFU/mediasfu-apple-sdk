@@ -128,6 +128,35 @@ struct MediaSFUView: UIViewControllerRepresentable {
 }
 ```
 
+### Backend-proxy room handoff
+
+Use this mode when your application backend creates or joins the MediaSFU room.
+The iOS app receives only the room-scoped `roomName`, `secret`, and `link` from
+that backend response:
+
+```swift
+config.apiUserName = "dummyUsr"
+config.apiKey = String(repeating: "0", count: 64)
+config.connectMediaSFU = true
+
+config.action = "join"
+config.userName = displayName
+config.roomName = response.roomName
+config.roomApiToken = response.secret
+config.roomLink = response.link
+config.autoProceed = true
+```
+
+The two placeholder values are deliberately non-secret and only satisfy the
+pre-join configuration shape. Before the socket connection, the SDK replaces
+them with the room-scoped handoff: `roomName` becomes the socket username,
+`secret` becomes the socket token, and `link` selects the media node. The SDK
+does not make another account-authenticated create/join request.
+
+Do not put a real account API key in an iOS app that uses this pattern. Keep it
+in the backend's private environment. Also leave `localLink` empty: a backend
+proxy for MediaSFU Cloud is not a self-hosted MediaSFU Open / CE instance.
+
 ---
 
 ## 💎 Platform Features
@@ -153,6 +182,8 @@ struct MediaSFUView: UIViewControllerRepresentable {
 | `roomName` | Target room identifier for join actions. |
 | `userName` | Display name of the local participant. |
 | `eventType` | Event room layout profile (`"conference"`, `"broadcast"`, `"webinar"`, `"chat"`). |
+| `roomApiToken` | Room-scoped `secret` returned by an application backend. Use with `roomName` and `roomLink`. |
+| `roomLink` | Media-node link returned with a backend room handoff. This is not `localLink`. |
 
 ---
 
