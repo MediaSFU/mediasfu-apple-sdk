@@ -60,8 +60,8 @@ The primary entry point for configuring a MediaSFU session is the `MediaSFUIosLa
 
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
-| `apiUserName` | `String` | Yes (Cloud) | Your MediaSFU account username. Get this from the [MediaSFU Dashboard](https://mediasfu.com). |
-| `apiKey` | `String` | Yes (Cloud) | Your MediaSFU application API key. Used to sign and validate session requests. |
+| `apiUserName` | `String` | Standard Cloud flow | Your MediaSFU account username. Get this from the [MediaSFU Dashboard](https://mediasfu.com). A backend handoff does not require it in the client. |
+| `apiKey` | `String` | Standard Cloud flow | Your MediaSFU application API key. A backend handoff should keep this credential on the server. |
 | `localLink` | `String` | Optional | Set this **only** when connecting to a self-hosted **MediaSFU Open / Community Edition (CE)** server, e.g. `https://your-ce-instance.example.com`. Leave empty for MediaSFU Cloud. |
 | `connectMediaSFU` | `Bool` | Yes | Set to `true` to establish signaling connections with MediaSFU servers. Set to `false` for offline UI testing/previews. |
 
@@ -71,6 +71,8 @@ The primary entry point for configuring a MediaSFU session is the `MediaSFUIosLa
 | :--- | :--- | :--- | :--- |
 | `action` | `String` | `"create"` | `"create"` to host a new room session, `"join"` to connect to an existing room. |
 | `roomName` | `String` | `""` | The unique room identifier (e.g., `"s1234567"`). Must be supplied when `action` is `"join"`. |
+| `roomApiToken` | `String` | `""` | Optional room-scoped secret returned by your backend's MediaSFU create/join response. When supplied, the SDK uses `roomName` as the socket username and this value as the socket token. |
+| `roomLink` | `String` | `""` | Optional media-node link returned with `roomApiToken`. Supply this together with `roomApiToken` to reuse an already-created/joined cloud room. |
 | `userName` | `String` | `""` | The display name of the local participant. |
 | `eventType` | `String` | `"conference"` | The room profile. Supported profiles: `"conference"`, `"broadcast"`, `"webinar"`, `"chat"`. See [Event Types](#event-types). |
 | `durationMinutes` | `Int` | `60` | The session duration limit (for new rooms). |
@@ -194,6 +196,27 @@ class MainMenuViewController: UIViewController {
 ## 🏗️ Headless Mode (Custom UI Integration)
 
 If you want to build a completely custom, branded UI, you can run the SDK in **Headless Mode** (`returnUI = false`). This allows you to leverage MediaSFU's robust WebRTC connection state management and Socket signaling while maintaining complete control over your views.
+
+### Reusing a backend create/join response
+
+If your application server already creates or joins the room, pass the room-scoped
+values from that response to the native bridge and set `autoProceed` to `true`:
+
+```swift
+config.action = "join"
+config.roomName = response.roomName
+config.roomApiToken = response.secret
+config.roomLink = response.link
+config.userName = displayName
+config.autoProceed = true
+```
+
+The SDK uses the returned `roomName` as the socket `apiUserName` and the returned
+`secret` as the socket `apiToken`. It then connects directly to the returned media
+node, so it does not issue a second create/join request with the account API key.
+Keep account credentials on your server when using this handoff pattern. Leave
+`roomApiToken` and `roomLink` empty when you want the SDK to perform the standard
+cloud create/join flow itself.
 
 ```swift
 import SwiftUI
