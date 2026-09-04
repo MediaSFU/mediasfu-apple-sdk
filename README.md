@@ -43,6 +43,8 @@
 
 MediaSFU provides prebuilt, fully-featured room components with real-time video/audio, screen sharing, recording, chat, polls, whiteboards, real-time translation, and more. Drop the Swift Package into your Xcode project and connect to a room with a few lines of code.
 
+The current Apple runtime uses the same state-driven modern room renderer as the React, React Native, Flutter, and Kotlin SDKs. A hosted room has one controller that owns its socket, media transports, room state, modals, and visible interface.
+
 📖 **[Detailed Integration & API Guide (USAGE.md) →](USAGE.md)** | 🌐 **[mediasfu.com](https://www.mediasfu.com/)**
 
 ---
@@ -127,6 +129,12 @@ struct MediaSFUView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
 ```
+
+### Embedding the standard interface in your own layout
+
+Keep the controller returned by `makeHostViewController(config:)` mounted for the entire room session. Embed that same controller wherever the standard MediaSFU interface should appear; do not create another bridge or host controller to render the room a second time. This preserves one socket, one set of media transports, and one modal/navigation lifecycle.
+
+For a completely custom interface, keep the same controller mounted as the room runtime and render the native tracks returned by `latestLocalVideoTrack()` and `latestRemoteVideoTracks()`. See the [headless integration guide](USAGE.md#-headless-mode-custom-ui-integration) for the complete lifecycle and renderer example.
 
 ### Backend-proxy room handoff
 

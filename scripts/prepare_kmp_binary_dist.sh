@@ -25,8 +25,23 @@ VERSION="$(
     | head -n 1
 )"
 
+SDK_VERSION="$(
+  sed -n 's/^SDK_VERSION=//p' "$KOTLIN_REPO/version.properties" \
+    | head -n 1
+)"
+
 if [ -z "$VERSION" ]; then
   echo "Unable to detect shared podspec version from $KOTLIN_REPO/shared/shared.podspec" >&2
+  exit 1
+fi
+
+if [ -z "$SDK_VERSION" ]; then
+  echo "Unable to detect SDK_VERSION from $KOTLIN_REPO/version.properties" >&2
+  exit 1
+fi
+
+if [ "$VERSION" != "$SDK_VERSION" ]; then
+  echo "Kotlin Apple version mismatch: shared.podspec=$VERSION, version.properties=$SDK_VERSION" >&2
   exit 1
 fi
 

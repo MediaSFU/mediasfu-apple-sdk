@@ -83,6 +83,8 @@ The primary entry point for configuring a MediaSFU session is the `MediaSFUIosLa
 
 Hosted UI is the easiest way to add video calling to your app. The SDK loads a fully featured, pre-built, theme-aware user interface complete with video grids, participant lists, chat, recording, and modal controls.
 
+The hosted controller renders the maintained modern component tree from the room state it owns. This is the Apple equivalent of `ModernMediasfuGenericHead` in the React, React Native, Flutter, and Kotlin SDKs: the renderer does not create a second socket, transport set, or copy of room state.
+
 ### SwiftUI Integration
 
 Wrap the host controller in a SwiftUI `UIViewControllerRepresentable`:
@@ -193,6 +195,8 @@ class MainMenuViewController: UIViewController {
 For a custom app flow, set `autoProceed` to `true` and mount the returned host
 controller inside your own SwiftUI or UIKit interface. The controller owns the
 room, socket, and media lifecycle even when your app renders the visible controls.
+
+Create one `MediaSFUIosHostBridge` and call `makeHostViewController` once per room session. Retain both objects until the room ends. For a hybrid layout, place that same controller in the part of your interface where the standard room UI should render. For a fully custom layout, keep it mounted with non-zero bounds and render its published native tracks in your own views. Creating a second host controller is not a rendering shortcut; it creates a second room engine.
 
 ### Reusing a backend create/join response
 
