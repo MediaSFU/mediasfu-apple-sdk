@@ -426,3 +426,10 @@ Custom native transports can parse Foundation dictionary replies with
 structured and legacy catalogues without relying on Kotlin's `Any` bridge for
 Foundation collections. `MediaSFUKmpTranslationVoiceSession` uses the runtime's
 typed catalogue directly; applications do not need to parse its result again.
+
+An app that constructs `MSCDevice` or directly uses other native-media types must
+link the `MediaSFUMediasoupClient` product in its app target as well as
+`MediaSFUAppleSDK`. A Swift re-export makes types visible to the compiler; it does
+not add that defining library to every consumer's link command. Keep both targets
+on the same native-client package/version. The sample includes this explicit
+product dependency.

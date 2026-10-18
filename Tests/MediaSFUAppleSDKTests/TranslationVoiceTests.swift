@@ -45,7 +45,7 @@ final class TranslationVoiceTests: XCTestCase {
         XCTAssertEqual(MSCDevice().nativeIntegrationMode, .fullyBundledNative)
     }
 
-    func testFrameworkIsLinkedAndStructuredLegacyNeutralMetadataSurviveSwiftExport() {
+    func testFoundationCataloguesPreserveStructuredLegacyNeutralVoicesAndMetadata() {
         XCTAssertTrue(MediaSFUKmpBridgeInstaller.isKmpModuleAvailable())
         let value = parse(reply())
         XCTAssertEqual(value.voices.map(\.id), ["fixture-m", "fixture-n"])

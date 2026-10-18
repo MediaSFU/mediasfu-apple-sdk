@@ -19,6 +19,17 @@ target.package_product_dependencies << product
 build_file = project.new(Xcodeproj::Project::Object::PBXBuildFile)
 build_file.product_ref = product
 target.frameworks_build_phase.files << build_file
+# The app constructs MSCDevice directly, so link its defining product explicitly.
+native_reference = project.new(Xcodeproj::Project::Object::XCLocalSwiftPackageReference)
+native_reference.relative_path = '../../../mediasfu-mediasoup-client-ios'
+project.root_object.package_references << native_reference
+native_product = project.new(Xcodeproj::Project::Object::XCSwiftPackageProductDependency)
+native_product.package = native_reference
+native_product.product_name = 'MediaSFUMediasoupClient'
+target.package_product_dependencies << native_product
+native_file = project.new(Xcodeproj::Project::Object::PBXBuildFile)
+native_file.product_ref = native_product
+target.frameworks_build_phase.files << native_file
 embed = target.new_copy_files_build_phase('Embed Frameworks')
 embed.dst_subfolder_spec = '10'
 embedded = project.new(Xcodeproj::Project::Object::PBXBuildFile)

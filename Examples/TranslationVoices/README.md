@@ -54,3 +54,9 @@ selects a returned entry and checks output-language invalidation. It requests th
 room's normal exit flow and terminates the app during cleanup. Follow your
 fixture's server-side room cleanup rules too. This test skips when no handoff is
 provided and does not claim translated audio playback or physical-device support.
+
+The sample links `MediaSFUMediasoupClient` explicitly because it constructs
+`MSCDevice` in app code. Its local project reference expects the configured native
+client checkout at `../../../mediasfu-mediasoup-client-ios` relative to this sample;
+adjust that reference if your checkout has a different name. Keep it aligned with
+`MEDIA_SFU_MEDIASOUP_PACKAGE_PATH` so the app and SDK use the same native client.
