@@ -6,9 +6,15 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 URL="${1:-}"
 CHECKSUM="${2:-}"
 OUTPUT="${3:-$REPO_ROOT/Package.swift}"
+NATIVE_CLIENT_VERSION="${4:-}"
 
-if [ -z "$URL" ] || [ -z "$CHECKSUM" ]; then
-  echo "Usage: $0 <artifact-url> <checksum> [output-file]" >&2
+if [ -z "$URL" ] || [ -z "$CHECKSUM" ] || [ -z "$NATIVE_CLIENT_VERSION" ]; then
+  echo "Usage: $0 <artifact-url> <checksum> <output-file> <native-client-version>" >&2
+  exit 1
+fi
+
+if [ "$NATIVE_CLIENT_VERSION" = "0.1.3" ]; then
+  echo "Native client 0.1.3 lacks an importable module. Supply a validated module-complete release." >&2
   exit 1
 fi
 
@@ -29,7 +35,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "0.1.3")
+        .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "$NATIVE_CLIENT_VERSION")
     ],
     targets: [
         .binaryTarget(

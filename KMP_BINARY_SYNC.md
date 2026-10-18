@@ -97,5 +97,8 @@ the XCFramework archive alone is insufficient for those distributions.
 
 Public release packaging is a separate step. Use a new immutable asset URL and
 its exact checksum, and ship any required resources. The manifest renderer enables
-the native adapter for a runtime built from this source. Do not point that manifest
-at a previously published framework that lacks the new exports.
+the native adapter for a runtime built from this source. Its fourth argument is
+the minimum version of a validated, module-complete native-media client release;
+it refuses the known module-less 0.1.3 release. Do not point that manifest at a
+previously published framework that lacks the new exports. Publication and selecting
+that dependency release remain separate from local validation.
