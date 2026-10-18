@@ -50,6 +50,22 @@ MEDIA_SFU_SKIP_DEVICE_BUILD=0 MEDIA_SFU_SKIP_SIMULATOR_BUILD=0 \
 The current distribution contains iOS arm64 device and arm64 simulator slices.
 Intel simulator support is not part of this distribution.
 
+For native-media validation, also point at a configured source checkout of the
+[mediasoup Apple client](https://github.com/MediaSFU/mediasfu-mediasoup-client-apple),
+with its source manifest and WebRTC/libmediasoupclient artifacts prepared:
+
+```sh
+export MEDIA_SFU_MEDIASOUP_PACKAGE_PATH="../mediasfu-mediasoup-client-ios"
+export MEDIA_SFU_ENABLE_REAL_LIBMEDIASOUPCLIENT_BINDING=1
+```
+
+`MEDIA_SFU_MEDIASOUP_PACKAGE_PATH` overrides the native-media package dependency
+without modifying a released asset. The hosted 0.1.3 native-media framework lacks
+an importable module, so use the maintained source package for this validation.
+The translation build fails if the native-media module is missing. A future
+binary release must include an importable native-media dependency as well as the
+new KMP runtime; resolving the old binary does not establish media support.
+
 While `MEDIA_SFU_APPLE_ARTIFACTS_DIR` is set, `Package.swift` makes the actual
 `MediaSFUSDKBinary` dependency point at that directory's XCFramework and enables
 the new native translation adapter. The existing hosted asset remains unchanged;

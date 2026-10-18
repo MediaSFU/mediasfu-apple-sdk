@@ -384,7 +384,9 @@ struct NativeVideoRenderer: UIViewRepresentable {
 The native stock picker is available when building this branch with the fresh
 KMP distribution described in [KMP Binary Sync](KMP_BINARY_SYNC.md). The existing
 published framework predates these native APIs; a new binary release is required
-before using them from a versioned package dependency.
+before using them from a versioned package dependency. Local validation also
+requires the importable native-media source dependency described in that guide;
+the hosted 0.1.3 native-media binary does not contain its module.
 
 Use the same bridge that owns your mounted room controller:
 

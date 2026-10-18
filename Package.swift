@@ -19,6 +19,10 @@ let runtime: Target = artifactsDirectory.map {
     url: "https://github.com/MediaSFU/mediasfu-apple-sdk/releases/download/0.1.7/MediaSFUSDK-1.0.8.xcframework.zip",
     checksum: "094d8aa5b8fe5e3aa597c348f1c695583a4f95c9213311d5c2949a14e95a5720"
 )
+let nativePackageOverride = ProcessInfo.processInfo.environment["MEDIA_SFU_MEDIASOUP_PACKAGE_PATH"]
+let nativePackage: Package.Dependency = nativePackageOverride.map {
+    .package(name: "mediasfu-mediasoup-client-apple", path: $0)
+} ?? .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "0.1.3")
 let translationSettings: [SwiftSetting] = artifactsDirectory == nil ? [] : [.define("MEDIA_SFU_HAS_TRANSLATION_VOICES")]
 
 let package = Package(
@@ -34,7 +38,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "0.1.3")
+        nativePackage
     ],
     targets: [
         runtime,

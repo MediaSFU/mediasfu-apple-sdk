@@ -72,6 +72,8 @@ struct TranslationVoicesApp: App {
                         }
                         Text(MediaSFUKmpBridgeInstaller.isKmpModuleAvailable() ? "MediaSFU runtime linked" : "MediaSFU runtime unavailable")
                             .accessibilityIdentifier("runtimeLinkStatus")
+                        Text(MSCNativeIntegrationStatus.currentMode == .fullyBundledNative ? "Native media binding active" : "Native media binding unavailable")
+                            .accessibilityIdentifier("nativeMediaStatus")
                     }
                     .navigationTitle("Translation voices")
                 }

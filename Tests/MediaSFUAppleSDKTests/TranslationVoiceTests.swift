@@ -26,6 +26,11 @@ final class TranslationVoiceTests: XCTestCase {
         MediaSFUTranslationCatalogue(TranslationVoiceCatalogueKt.parseTranslationVoiceCatalogue(response: value, language: language))
     }
 
+    func testNativeMediaBindingIsConcrete() {
+        XCTAssertTrue(MSCNativeIntegrationStatus.hasConcreteNativeBinding)
+        XCTAssertEqual(MSCDevice().nativeIntegrationMode, .fullyBundledNative)
+    }
+
     func testFrameworkIsLinkedAndStructuredLegacyNeutralMetadataSurviveSwiftExport() {
         XCTAssertTrue(MediaSFUKmpBridgeInstaller.isKmpModuleAvailable())
         let value = parse(reply())

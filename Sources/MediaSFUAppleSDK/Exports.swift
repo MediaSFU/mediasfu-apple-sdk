@@ -10,4 +10,6 @@
 
 #if canImport(MediaSFUMediasoupClient)
 @_exported import MediaSFUMediasoupClient
+#elseif os(iOS) && MEDIA_SFU_HAS_TRANSLATION_VOICES
+#error("Translation validation requires an importable MediaSFUMediasoupClient. Set MEDIA_SFU_MEDIASOUP_PACKAGE_PATH to the maintained source package when validating local runtimes.")
 #endif

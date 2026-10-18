@@ -9,7 +9,8 @@ handoff from your backend; keep account and provider credentials on the server.
 
 First build a fresh distribution using [KMP Binary Sync](../../KMP_BINARY_SYNC.md).
 Set `MEDIA_SFU_APPLE_ARTIFACTS_DIR` to that directory when resolving the package
-and building the sample. The package's `MediaSFUSDKBinary` target then links that
+and building the sample. Configure `MEDIA_SFU_MEDIASOUP_PACKAGE_PATH` and enable
+the real native binding as described in that guide. The package's `MediaSFUSDKBinary` target then links that
 local XCFramework rather than the last published runtime.
 
 Open `TranslationVoices.xcodeproj`, select the `TranslationVoices` scheme and an
