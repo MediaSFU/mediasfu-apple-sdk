@@ -399,7 +399,7 @@ voices through that room's authenticated socket. It displays returned names,
 genders (including neutral), provider and model metadata, and submits the exact
 selected `voiceId` together with `ttsProvider`. It never invents IDs or includes
 provider credentials. The server remains authoritative for room permissions and
-voice compatibility. A successful submission is not an audio-playback receipt.
+voice compatibility. A successful submission does not confirm audio playback.
 
 Requests are cancellable and bounded to 20 seconds. Empty, malformed,
 unavailable, unsupported-schema and wrong-language catalogues cannot authorize
