@@ -27,7 +27,10 @@ public struct MediaSFUTranslationVoicePicker: View {
             }
             if mode == "stock" {
                 Section(header: Text("Stock voices")) {
-                    if model.loading {
+                    if model.submitted {
+                        Text("Voice settings submitted. The server validates the selection.")
+                        Button("Choose another voice") { reload() }
+                    } else if model.loading {
                         ProgressView("Loading voices…")
                     } else if model.catalogue.voices.isEmpty {
                         Text(model.catalogue.status == "empty" ? "No stock voices for this language." : "Voice catalogue unavailable.")
@@ -45,8 +48,9 @@ public struct MediaSFUTranslationVoicePicker: View {
                         }
                         if model.catalogue.truncated { Text("The provider returned a limited voice list.") }
                     }
-                    Button("Apply voice") { model.apply() }.disabled(!model.canApply)
-                    if model.submitted { Text("Voice settings submitted. The server validates the selection.") }
+                    if !model.submitted {
+                        Button("Apply voice") { model.apply() }.disabled(!model.canApply)
+                    }
                 }
             } else {
                 Text("Use the hosted translation settings to apply a basic preference or your existing clone configuration.")
