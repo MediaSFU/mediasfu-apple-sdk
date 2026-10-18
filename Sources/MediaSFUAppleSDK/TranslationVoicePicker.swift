@@ -24,6 +24,7 @@ public struct MediaSFUTranslationVoicePicker: View {
                     Text("Stock voice").tag("stock")
                     Text("Configured voice").tag("configured")
                 }
+                .pickerStyle(.segmented)
             }
             if mode == "stock" {
                 Section(header: Text("Stock voices")) {
@@ -45,6 +46,8 @@ public struct MediaSFUTranslationVoicePicker: View {
                                     if model.selectedID == voice.id { Image(systemName: "checkmark") }
                                 }
                             }
+                            .accessibilityIdentifier("translationVoice:" + voice.id)
+                            .accessibilityValue(model.selectedID == voice.id ? "Selected" : "Not selected")
                         }
                         if model.catalogue.truncated { Text("The provider returned a limited voice list.") }
                     }

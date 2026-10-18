@@ -43,8 +43,15 @@ struct TranslationVoicesApp: App {
         WindowGroup {
             if let controller = room.controller {
                 VStack(spacing: 0) {
-                    Button("Translation voice") { showingVoices = true }
-                        .padding()
+                    HStack {
+                        Menu("Room") {
+                            Button("Translation settings") { _ = room.host.triggerShowModal(name: "translation") }
+                            Button("Leave room") { _ = room.host.triggerShowModal(name: "confirm_exit") }
+                        }
+                        Spacer()
+                        Button("Translation voice") { showingVoices = true }
+                    }
+                    .padding()
                     HostedRoom(controller: controller)
                 }
                 .sheet(isPresented: $showingVoices) {
