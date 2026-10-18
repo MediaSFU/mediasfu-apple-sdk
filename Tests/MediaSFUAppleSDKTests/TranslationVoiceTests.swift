@@ -23,7 +23,21 @@ final class TranslationVoiceTests: XCTestCase {
     }
 
     private func parse(_ value: Any?, language: String = "fr") -> MediaSFUTranslationCatalogue {
-        MediaSFUTranslationCatalogue(TranslationVoiceCatalogueKt.parseTranslationVoiceCatalogue(response: value, language: language))
+        MediaSFUTranslationCatalogue.parse(value, language: language)
+    }
+
+    func testTypedKmpCatalogueExportPreservesAllFields() {
+        let voice = TranslationVoice(id: "fixture-neutral", name: "Neutral", gender: "neutral", provider: "test-provider", language: "fr")
+        let source = TranslationVoiceCatalogue(provider: "test-provider", language: "fr", voices: [voice],
+                                               status: "available", model: "test-model", schemaVersion: 1, truncated: true)
+        let value = MediaSFUTranslationCatalogue(source)
+        XCTAssertEqual(value.voices.first?.id, "fixture-neutral")
+        XCTAssertEqual(value.voices.first?.gender, "neutral")
+        XCTAssertEqual(value.model, "test-model")
+        XCTAssertEqual(value.provider, "test-provider")
+        XCTAssertEqual(value.language, "fr")
+        XCTAssertEqual(value.schemaVersion, 1)
+        XCTAssertTrue(value.truncated)
     }
 
     func testNativeMediaBindingIsConcrete() {
@@ -45,7 +59,7 @@ final class TranslationVoiceTests: XCTestCase {
 
     func testMalformedEmptyUnavailableUnsupportedAndLanguageMismatchFailClosed() {
         for invalid in [nil, "malformed", false, [:], reply(["provider": ""]), reply(["schemaVersion": 2]),
-                        reply(["language": "de"]), reply(["status": "unavailable"]),
+                        reply(["language": "de"]), reply(["schemaVersion": true]), reply(["schemaVersion": "1"]), reply(["status": "unavailable"]),
                         reply(["error": ["code": "unavailable"]]), reply(["voices": []])] as [Any?] {
             let value = parse(invalid)
             XCTAssertTrue(value.voices.isEmpty)
@@ -91,6 +105,7 @@ final class TranslationVoiceTests: XCTestCase {
             let stale = session.completions[0]
             session.complete(parse(reply()))
             model.select("fixture-n")
+            XCTAssertTrue(model.canApply)
             session.revision = change
             XCTAssertFalse(model.canApply)
             model.refreshContext()

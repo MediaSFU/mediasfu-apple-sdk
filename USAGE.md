@@ -420,3 +420,9 @@ complete room/picker wiring.
 Native compilation, Swift linkage, simulator execution and physical-device
 audio are separate validation steps. Simulator tests do not establish audible
 translated output on a physical iPhone.
+
+Custom native transports can parse Foundation dictionary replies with
+`MediaSFUTranslationCatalogue.parse(reply, language: outputLanguage)`. This handles
+structured and legacy catalogues without relying on Kotlin's `Any` bridge for
+Foundation collections. `MediaSFUKmpTranslationVoiceSession` uses the runtime's
+typed catalogue directly; applications do not need to parse its result again.

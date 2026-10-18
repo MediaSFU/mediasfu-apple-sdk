@@ -1,4 +1,5 @@
 import Foundation
+import CoreFoundation
 import Combine
 
 public struct MediaSFUTranslationVoice: Identifiable, Equatable {
@@ -27,6 +28,55 @@ public struct MediaSFUTranslationCatalogue: Equatable {
                 model: String? = nil, schemaVersion: Int = 1, truncated: Bool = false) {
         self.provider = provider; self.language = language; self.voices = voices
         self.status = status; self.model = model; self.schemaVersion = schemaVersion; self.truncated = truncated
+    }
+
+    /// Parses Foundation replies for custom native transports. KMP sessions already return typed catalogues.
+    public static func parse(_ response: Any?, language: String) -> Self {
+        guard let data = response as? [String: Any],
+              let groups = data["voices"] as? [String: Any],
+              let rawProvider = data["provider"] as? String else { return .unavailable(language) }
+        let provider = rawProvider.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !provider.isEmpty else { return .unavailable(language) }
+        if let schema = data["schemaVersion"] {
+            guard let number = schema as? NSNumber, CFGetTypeID(number) != CFBooleanGetTypeID(),
+                  number.doubleValue == 1 else { return .unavailable(language) }
+        }
+        let resultLanguage = data["language"] as? String ?? language
+        guard resultLanguage.caseInsensitiveCompare(language) == .orderedSame else { return .unavailable(language) }
+        if let error = data["error"], !(error is NSNull) {
+            let falseBoolean = (error as? NSNumber).map {
+                CFGetTypeID($0) == CFBooleanGetTypeID() && !$0.boolValue
+            } ?? false
+            guard falseBoolean || (error as? String) == "" else { return .unavailable(language) }
+        }
+        let status = data["status"] as? String
+        guard status == nil || status == "available" || status == "empty" else { return .unavailable(language) }
+        let genders = ["male", "female", "neutral"]
+        var seen = Set<String>()
+        var voices: [MediaSFUTranslationVoice] = []
+        for group in genders {
+            for entry in groups[group] as? [Any] ?? [] {
+                let fields = entry as? [String: Any]
+                guard let id = (entry as? String) ?? (fields?["id"] as? String),
+                      !id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { continue }
+                if let declared = fields?["provider"] as? String,
+                   declared.caseInsensitiveCompare(provider) != .orderedSame { continue }
+                guard seen.insert(id).inserted else { continue }
+                let suppliedGender = fields?["gender"] as? String
+                let gender = suppliedGender.map { genders.contains($0) ? $0 : "neutral" } ?? group
+                let name = (fields?["name"] as? String).flatMap {
+                    $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : $0
+                } ?? id
+                voices.append(.init(id: id, name: name, gender: gender, provider: provider, language: resultLanguage))
+            }
+        }
+        let truncated = (data["truncated"] as? NSNumber).map {
+            CFGetTypeID($0) == CFBooleanGetTypeID() && $0.boolValue
+        } ?? false
+        return Self(provider: provider, language: resultLanguage,
+                    voices: status == "empty" ? [] : voices,
+                    status: status == "empty" || voices.isEmpty ? "empty" : "available",
+                    model: data["model"] as? String, truncated: truncated)
     }
 
     static func unavailable(_ language: String) -> Self {
