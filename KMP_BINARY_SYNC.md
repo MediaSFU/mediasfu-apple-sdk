@@ -38,7 +38,8 @@ Use JDK 17 and a new, empty artifact directory for each build. The helper refuse
 to replace existing outputs. Keep release device and simulator builds enabled:
 
 ```sh
-export MEDIA_SFU_APPLE_ARTIFACTS_DIR="$(mktemp -d)"
+mkdir -p Artifacts
+export MEDIA_SFU_APPLE_ARTIFACTS_DIR="$(mktemp -d "$PWD/Artifacts/translation-voices.XXXXXX")"
 export MEDIA_SFU_JAVA_HOME="$(/usr/libexec/java_home -v 17)"
 export JAVA_HOME="$MEDIA_SFU_JAVA_HOME"
 MEDIA_SFU_SKIP_DEVICE_BUILD=0 MEDIA_SFU_SKIP_SIMULATOR_BUILD=0 \

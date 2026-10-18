@@ -4,8 +4,16 @@ import Foundation
 
 // Maintainer validation can link an unpublished build without changing a released asset.
 let artifactsDirectory = ProcessInfo.processInfo.environment["MEDIA_SFU_APPLE_ARTIFACTS_DIR"]
+func relativeRuntimePath(_ directory: String) -> String {
+    let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().standardizedFileURL
+    let destination = URL(fileURLWithPath: directory, relativeTo: root)
+        .appendingPathComponent("MediaSFUSDK.xcframework").standardizedFileURL
+    let common = zip(root.pathComponents, destination.pathComponents).prefix { $0 == $1 }.count
+    return (Array(repeating: "..", count: root.pathComponents.count - common)
+        + destination.pathComponents.dropFirst(common)).joined(separator: "/")
+}
 let runtime: Target = artifactsDirectory.map {
-    .binaryTarget(name: "MediaSFUSDKBinary", path: $0 + "/MediaSFUSDK.xcframework")
+    .binaryTarget(name: "MediaSFUSDKBinary", path: relativeRuntimePath($0))
 } ?? .binaryTarget(
     name: "MediaSFUSDKBinary",
     url: "https://github.com/MediaSFU/mediasfu-apple-sdk/releases/download/0.1.7/MediaSFUSDK-1.0.8.xcframework.zip",
