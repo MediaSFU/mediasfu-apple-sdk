@@ -69,6 +69,19 @@ final class TranslationVoiceTests: XCTestCase {
         XCTAssertFalse(model.canApply)
     }
 
+    func testRejectedApplicationDoesNotReportSubmission() {
+        let session = VoiceSessionStub()
+        session.acceptApplication = false
+        let model = MediaSFUTranslationVoicePickerModel(session: session)
+        model.load(language: "fr")
+        session.complete(parse(reply()))
+        model.select("fixture-n")
+        XCTAssertFalse(model.apply())
+        XCTAssertTrue(model.applicationFailed)
+        XCTAssertFalse(model.submitted)
+        XCTAssertFalse(model.canApply)
+    }
+
     func testEveryContextChangeInvalidatesSelectionAndRejectsStaleReplies() {
         // Tokens reflect room, socket identity/reconnect, output language, provider/model, settings and mode.
         for change in ["room", "socket", "language", "provider", "model", "mode"] {
@@ -158,6 +171,7 @@ private final class VoiceSessionStub: MediaSFUTranslationVoiceSession {
     var completions: [(MediaSFUTranslationCatalogue) -> Void] = []
     var cancellations = 0
     var applied: [String: String] = [:]
+    var acceptApplication = true
     func contextToken(language: String, mode: String) -> String { "\(revision)/\(language)/\(mode)" }
     func load(language: String, mode: String, completion: @escaping (MediaSFUTranslationCatalogue) -> Void) -> () -> Void {
         if rotateOnLoad { revision = UUID().uuidString }
@@ -171,7 +185,7 @@ private final class VoiceSessionStub: MediaSFUTranslationVoiceSession {
     func apply(language: String, mode: String, token: String, voiceId: String, provider: String) -> Bool {
         guard token == contextToken(language: language, mode: mode) else { return false }
         applied = ["voiceId": voiceId, "ttsProvider": provider]
-        return true
+        return acceptApplication
     }
 }
 #endif

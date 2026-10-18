@@ -51,6 +51,7 @@ public final class MediaSFUTranslationVoicePickerModel: ObservableObject {
     @Published public private(set) var selectedID: String?
     @Published public private(set) var loading = false
     @Published public private(set) var submitted = false
+    @Published public private(set) var applicationFailed = false
     private let session: MediaSFUTranslationVoiceSession
     private let timeout: TimeInterval
     private var cancelRequest: (() -> Void)?
@@ -74,6 +75,7 @@ public final class MediaSFUTranslationVoicePickerModel: ObservableObject {
         selectedID = nil
         loading = false
         submitted = false
+        applicationFailed = false
         catalogue = .unavailable(language)
         token = session.contextToken(language: language, mode: mode)
     }
@@ -138,11 +140,12 @@ public final class MediaSFUTranslationVoicePickerModel: ObservableObject {
     }
 
     @discardableResult public func apply() -> Bool {
-        guard canApply, let selectedID else { cancel(); return false }
+        guard canApply, let selectedID else { cancel(); applicationFailed = true; return false }
         let accepted = session.apply(language: language, mode: mode, token: token,
                                      voiceId: selectedID, provider: catalogue.provider)
         cancel()
         submitted = accepted
+        applicationFailed = !accepted
         token = session.contextToken(language: language, mode: mode)
         return accepted
     }

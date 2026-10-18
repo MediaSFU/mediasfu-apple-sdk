@@ -28,7 +28,10 @@ public struct MediaSFUTranslationVoicePicker: View {
             }
             if mode == "stock" {
                 Section(header: Text("Stock voices")) {
-                    if model.submitted {
+                    if model.applicationFailed {
+                        Text("Voice settings were not submitted. Enable spoken translation in the room settings, then reload voices.")
+                        Button("Reload voices") { reload() }
+                    } else if model.submitted {
                         Text("Voice settings submitted. The server validates the selection.")
                         Button("Choose another voice") { reload() }
                     } else if model.loading {
