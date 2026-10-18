@@ -117,6 +117,16 @@ final class TranslationVoiceTests: XCTestCase {
         XCTAssertFalse(model.canApply)
     }
 
+    func testTransportMayRotateTokenWhenStartingANewRequest() {
+        let session = VoiceSessionStub()
+        session.rotateOnLoad = true
+        let model = MediaSFUTranslationVoicePickerModel(session: session)
+        model.load(language: "fr")
+        session.complete(parse(reply()))
+        model.select("fixture-n")
+        XCTAssertTrue(model.apply())
+    }
+
     func testNativeBridgeReturnsSafeUnavailableWithoutMountedRoom() async {
         let host = MediaSFUIosHostBridge()
         let session = MediaSFUKmpTranslationVoiceSession(host: host)
@@ -135,11 +145,13 @@ final class TranslationVoiceTests: XCTestCase {
 @MainActor
 private final class VoiceSessionStub: MediaSFUTranslationVoiceSession {
     var revision = "initial"
+    var rotateOnLoad = false
     var completions: [(MediaSFUTranslationCatalogue) -> Void] = []
     var cancellations = 0
     var applied: [String: String] = [:]
     func contextToken(language: String, mode: String) -> String { "\(revision)/\(language)/\(mode)" }
     func load(language: String, mode: String, completion: @escaping (MediaSFUTranslationCatalogue) -> Void) -> () -> Void {
+        if rotateOnLoad { revision = UUID().uuidString }
         completions.append(completion)
         return { self.cancellations += 1 }
     }
