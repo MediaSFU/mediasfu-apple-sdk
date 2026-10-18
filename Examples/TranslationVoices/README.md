@@ -33,3 +33,24 @@ voice** leaves basic preference and clone configuration in the hosted settings.
 
 Use the room's exit control to leave and release its media. Simulator builds and
 unit tests do not establish physical-device translated audio acceptance.
+
+## Tests
+
+Run the sample's UI tests on an installed simulator after configuring the two
+package overrides above. The startup test verifies that the runtime loads and
+that the native-media binding is active.
+
+The optional `testLiveCatalogueInOwnedRoom` test requires these test-runner
+environment values from an already authorized, owned room:
+
+- `MEDIASFU_TEST_DISPLAY_NAME`
+- `MEDIASFU_TEST_ROOM_NAME`
+- `MEDIASFU_TEST_ROOM_TOKEN`
+- `MEDIASFU_TEST_ROOM_LINK`
+
+Configure them in your local Xcode test environment; do not commit their values.
+The test enters the normal handoff form, loads the French stock catalogue,
+selects a returned entry and checks output-language invalidation. It requests the
+room's normal exit flow and terminates the app during cleanup. Follow your
+fixture's server-side room cleanup rules too. This test skips when no handoff is
+provided and does not claim translated audio playback or physical-device support.
