@@ -75,6 +75,7 @@ public final class MediaSFUTranslationVoicePickerModel: ObservableObject {
         loading = false
         submitted = false
         catalogue = .unavailable(language)
+        token = session.contextToken(language: language, mode: mode)
     }
 
     public func load(language: String, mode: String = "stock") {

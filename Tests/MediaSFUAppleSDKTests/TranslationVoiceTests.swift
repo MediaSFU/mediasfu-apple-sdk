@@ -107,11 +107,14 @@ final class TranslationVoiceTests: XCTestCase {
 
     func testTimeoutCancelsTransportAndLateResponseCannotRestoreVoices() async throws {
         let session = VoiceSessionStub()
+        session.rotateOnCancel = true
         let model = MediaSFUTranslationVoicePickerModel(session: session, timeout: 0.02)
         model.load(language: "fr")
         try await Task.sleep(nanoseconds: 100_000_000)
         XCTAssertFalse(model.loading)
         XCTAssertEqual(session.cancellations, 1)
+        model.refreshContext()
+        XCTAssertEqual(session.completions.count, 1) // A timed-out request waits for explicit retry.
         session.complete(parse(reply()))
         XCTAssertTrue(model.catalogue.voices.isEmpty())
         XCTAssertFalse(model.canApply)
@@ -146,6 +149,7 @@ final class TranslationVoiceTests: XCTestCase {
 private final class VoiceSessionStub: MediaSFUTranslationVoiceSession {
     var revision = "initial"
     var rotateOnLoad = false
+    var rotateOnCancel = false
     var completions: [(MediaSFUTranslationCatalogue) -> Void] = []
     var cancellations = 0
     var applied: [String: String] = [:]
@@ -153,7 +157,10 @@ private final class VoiceSessionStub: MediaSFUTranslationVoiceSession {
     func load(language: String, mode: String, completion: @escaping (MediaSFUTranslationCatalogue) -> Void) -> () -> Void {
         if rotateOnLoad { revision = UUID().uuidString }
         completions.append(completion)
-        return { self.cancellations += 1 }
+        return {
+            self.cancellations += 1
+            if self.rotateOnCancel { self.revision = UUID().uuidString }
+        }
     }
     func complete(_ value: MediaSFUTranslationCatalogue) { completions.last?(value) }
     func apply(language: String, mode: String, token: String, voiceId: String, provider: String) -> Bool {
