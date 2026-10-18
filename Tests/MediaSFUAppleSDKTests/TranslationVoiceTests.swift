@@ -48,12 +48,12 @@ final class TranslationVoiceTests: XCTestCase {
                         reply(["language": "de"]), reply(["status": "unavailable"]),
                         reply(["error": ["code": "unavailable"]]), reply(["voices": []])] as [Any?] {
             let value = parse(invalid)
-            XCTAssertTrue(value.voices.isEmpty())
+            XCTAssertTrue(value.voices.isEmpty)
             XCTAssertEqual(value.status, "unavailable")
         }
         let empty = parse(reply(["status": "empty"]))
         XCTAssertEqual(empty.status, "empty")
-        XCTAssertTrue(empty.voices.isEmpty())
+        XCTAssertTrue(empty.voices.isEmpty)
     }
 
     func testExactVoiceAndProviderAreAppliedWithoutInventingAnID() {
@@ -100,14 +100,14 @@ final class TranslationVoiceTests: XCTestCase {
         old(parse(reply()))
         XCTAssertTrue(model.loading)
         session.complete(parse(reply())) // Wrong language cannot authorize a selection.
-        XCTAssertTrue(model.catalogue.voices.isEmpty())
+        XCTAssertTrue(model.catalogue.voices.isEmpty)
         model.load(language: "fr", mode: "configured")
         XCTAssertFalse(model.loading)
         XCTAssertNil(model.selectedID)
         XCTAssertGreaterThanOrEqual(session.cancellations, 2)
         model.cancel()
         old(parse(reply()))
-        XCTAssertTrue(model.catalogue.voices.isEmpty())
+        XCTAssertTrue(model.catalogue.voices.isEmpty)
     }
 
     func testTimeoutCancelsTransportAndLateResponseCannotRestoreVoices() async throws {
@@ -121,7 +121,7 @@ final class TranslationVoiceTests: XCTestCase {
         model.refreshContext()
         XCTAssertEqual(session.completions.count, 1) // A timed-out request waits for explicit retry.
         session.complete(parse(reply()))
-        XCTAssertTrue(model.catalogue.voices.isEmpty())
+        XCTAssertTrue(model.catalogue.voices.isEmpty)
         XCTAssertFalse(model.canApply)
     }
 
@@ -140,7 +140,7 @@ final class TranslationVoiceTests: XCTestCase {
         let session = MediaSFUKmpTranslationVoiceSession(host: host)
         let done = expectation(description: "bounded unavailable catalogue")
         let cancel = session.load(language: "fr", mode: "stock") { result in
-            XCTAssertTrue(result.voices.isEmpty())
+            XCTAssertTrue(result.voices.isEmpty)
             XCTAssertEqual(result.status, "unavailable")
             done.fulfill()
         }
