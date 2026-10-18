@@ -31,7 +31,7 @@ final class TranslationVoicesUITests: XCTestCase {
             if app.buttons["Room"].firstMatch.isHittable {
                 app.buttons["Room"].firstMatch.tap()
                 if app.buttons["Leave room"].waitForExistence(timeout: 2) { app.buttons["Leave room"].tap() }
-                let end = app.buttons.matching(NSPredicate(format: "label IN %@", ["End Event", "Leave Event", "End event", "Leave event"])).firstMatch
+                let end = app.buttons.matching(NSPredicate(format: "label IN %@", ["End for everyone", "Exit"])).firstMatch
                 if end.waitForExistence(timeout: 5) { end.tap() }
             }
             app.terminate()
