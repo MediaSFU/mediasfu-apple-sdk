@@ -36,6 +36,10 @@ embedded = project.new(Xcodeproj::Project::Object::PBXBuildFile)
 embedded.product_ref = product
 embedded.settings = { 'ATTRIBUTES' => %w[CodeSignOnCopy RemoveHeadersOnCopy] }
 embed.files << embedded
+native_embedded = project.new(Xcodeproj::Project::Object::PBXBuildFile)
+native_embedded.product_ref = native_product
+native_embedded.settings = { 'ATTRIBUTES' => %w[CodeSignOnCopy RemoveHeadersOnCopy] }
+embed.files << native_embedded
 phase = target.new_shell_script_build_phase('Copy Compose resources')
 phase.shell_script = <<~SCRIPT
   set -eu

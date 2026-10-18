@@ -11,6 +11,7 @@
 		231581BCAC2AB6BEC4CD2315 /* TranslationVoicesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3681233C85E4254420BC7C8 /* TranslationVoicesUITests.swift */; };
 		2EC68AD75B7581DFBE6BED45 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8EF73A2A8A57FD32A86F36E /* Foundation.framework */; };
 		496A68274D690BE90EE0A97C /* TranslationVoicesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8C05887327FAAE76262A8D /* TranslationVoicesApp.swift */; };
+		564E7116A801D6593B4954C0 /* MediaSFUMediasoupClient in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 9CF400CBED640259E6760A2B /* MediaSFUMediasoupClient */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CB4F8CA8543614B7A5C2C2E0 /* MediaSFUAppleSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 6B1ACBF22FCD30D788CA2D13 /* MediaSFUAppleSDK */; };
 		CF719BCC4A97535C3BD5C6FB /* MediaSFUMediasoupClient in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF400CBED640259E6760A2B /* MediaSFUMediasoupClient */; };
 		DC7D622211D783EB5BA93C93 /* MediaSFUAppleSDK in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 6B1ACBF22FCD30D788CA2D13 /* MediaSFUAppleSDK */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -34,6 +35,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				DC7D622211D783EB5BA93C93 /* MediaSFUAppleSDK in Embed Frameworks */,
+				564E7116A801D6593B4954C0 /* MediaSFUMediasoupClient in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;

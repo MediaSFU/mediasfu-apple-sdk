@@ -432,4 +432,4 @@ link the `MediaSFUMediasoupClient` product in its app target as well as
 `MediaSFUAppleSDK`. A Swift re-export makes types visible to the compiler; it does
 not add that defining library to every consumer's link command. Keep both targets
 on the same native-client package/version. The sample includes this explicit
-product dependency.
+product dependency and embeds the dynamic native-client framework in the app.
