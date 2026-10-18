@@ -1,5 +1,17 @@
 // swift-tools-version: 5.10
 import PackageDescription
+import Foundation
+
+// Maintainer validation can link an unpublished build without changing a released asset.
+let artifactsDirectory = ProcessInfo.processInfo.environment["MEDIA_SFU_APPLE_ARTIFACTS_DIR"]
+let runtime: Target = artifactsDirectory.map {
+    .binaryTarget(name: "MediaSFUSDKBinary", path: $0 + "/MediaSFUSDK.xcframework")
+} ?? .binaryTarget(
+    name: "MediaSFUSDKBinary",
+    url: "https://github.com/MediaSFU/mediasfu-apple-sdk/releases/download/0.1.7/MediaSFUSDK-1.0.8.xcframework.zip",
+    checksum: "094d8aa5b8fe5e3aa597c348f1c695583a4f95c9213311d5c2949a14e95a5720"
+)
+let translationSettings: [SwiftSetting] = artifactsDirectory == nil ? [] : [.define("MEDIA_SFU_HAS_TRANSLATION_VOICES")]
 
 let package = Package(
     name: "MediaSFUAppleSDK",
@@ -17,11 +29,7 @@ let package = Package(
         .package(url: "https://github.com/MediaSFU/mediasfu-mediasoup-client-apple.git", from: "0.1.3")
     ],
     targets: [
-        .binaryTarget(
-            name: "MediaSFUSDKBinary",
-            url: "https://github.com/MediaSFU/mediasfu-apple-sdk/releases/download/0.1.7/MediaSFUSDK-1.0.8.xcframework.zip",
-            checksum: "094d8aa5b8fe5e3aa597c348f1c695583a4f95c9213311d5c2949a14e95a5720"
-        ),
+        runtime,
         .target(
             name: "MediaSFUAppleSDK",
             dependencies: [
@@ -37,7 +45,7 @@ let package = Package(
                     condition: .when(platforms: [.iOS])
                 )
             ],
-            swiftSettings: [
+            swiftSettings: translationSettings + [
                 .define("MEDIA_SFU_HAS_MEDIASOUP_CLIENT", .when(platforms: [.iOS]))
             ]
         ),
@@ -46,7 +54,7 @@ let package = Package(
             dependencies: [
                 "MediaSFUAppleSDK"
             ],
-            swiftSettings: [
+            swiftSettings: translationSettings + [
                 .define("MEDIA_SFU_HAS_MEDIASOUP_CLIENT", .when(platforms: [.iOS]))
             ]
         )

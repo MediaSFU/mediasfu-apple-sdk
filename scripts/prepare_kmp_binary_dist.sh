@@ -73,13 +73,18 @@ METADATA_OUT="$ARTIFACTS_DIR/MediaSFUSDK-$VERSION.sync.json"
 KOTLIN_HEAD="$(git -C "$KOTLIN_REPO" rev-parse HEAD)"
 
 mkdir -p "$ARTIFACTS_DIR"
-rm -rf "$XCFRAMEWORK_OUT" "$ZIP_OUT" "$CHECKSUM_OUT" "$METADATA_OUT"
+for output in "$XCFRAMEWORK_OUT" "$ZIP_OUT" "$CHECKSUM_OUT" "$METADATA_OUT" "$ARTIFACTS_DIR/compose-resources"; do
+  if [ -e "$output" ]; then
+    echo "Output already exists: $output. Use a new MEDIA_SFU_APPLE_ARTIFACTS_DIR." >&2
+    exit 1
+  fi
+done
 
 run_gradle_task() {
   local task="$1"
   (
     cd "$KOTLIN_REPO"
-    GRADLE_USER_HOME="$GRADLE_USER_HOME" \
+    JAVA_HOME="$JAVA_HOME_OVERRIDE" GRADLE_USER_HOME="$GRADLE_USER_HOME" \
       "$KOTLIN_REPO/gradlew" \
       "-Dorg.gradle.java.home=$JAVA_HOME_OVERRIDE" \
       "-Dorg.gradle.jvmargs=$GRADLE_JVM_ARGS" \
@@ -120,10 +125,13 @@ fi
 XCODEBUILD_ARGS+=(-output "$XCFRAMEWORK_OUT")
 xcodebuild "${XCODEBUILD_ARGS[@]}"
 
-if [ -d "$COMPOSE_RESOURCES" ] && find "$COMPOSE_RESOURCES" -type f | grep -q .; then
-  echo "Compose resources were generated under $COMPOSE_RESOURCES." >&2
-  echo "Publish-time packaging still needs to place those resources with the app or framework consumer." >&2
+# Static frameworks do not copy resources into the application. Retain the sidecar
+# and let the consuming target copy it into its main bundle (see copy_compose_resources.sh).
+mkdir -p "$ARTIFACTS_DIR/compose-resources"
+if [ -d "$COMPOSE_RESOURCES" ]; then
+  ditto "$COMPOSE_RESOURCES" "$ARTIFACTS_DIR/compose-resources"
 fi
+RESOURCE_COUNT="$(find "$ARTIFACTS_DIR/compose-resources" -type f | wc -l | tr -d ' ')"
 
 ditto -c -k --sequesterRsrc --keepParent "$XCFRAMEWORK_OUT" "$ZIP_OUT"
 swift package compute-checksum "$ZIP_OUT" > "$CHECKSUM_OUT"
@@ -133,6 +141,8 @@ cat > "$METADATA_OUT" <<EOF
   "kotlin_version": "$VERSION",
   "kotlin_commit": "$KOTLIN_HEAD",
   "simulator_build_type": "$SIMULATOR_BUILD_TYPE",
+  "compose_resource_files": $RESOURCE_COUNT,
+  "compose_resources": "compose-resources",
   "xcframework": "$(basename "$XCFRAMEWORK_OUT")",
   "zip": "$(basename "$ZIP_OUT")",
   "checksum_file": "$(basename "$CHECKSUM_OUT")"

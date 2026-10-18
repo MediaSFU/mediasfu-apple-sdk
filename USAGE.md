@@ -378,3 +378,43 @@ struct NativeVideoRenderer: UIViewRepresentable {
 ### 3. Local Link Connection Failure
 * **Symptom**: Connection timeout when using `localLink` pointing to a self-hosted server.
 * **Fix**: Use an HTTPS endpoint with a certificate trusted by iOS and ensure the host satisfies your app's App Transport Security policy.
+
+## Native translation voice picker
+
+The native stock picker is available when building this branch with the fresh
+KMP distribution described in [KMP Binary Sync](KMP_BINARY_SYNC.md). The existing
+published framework predates these native APIs; a new binary release is required
+before using them from a versioned package dependency.
+
+Use the same bridge that owns your mounted room controller:
+
+```swift
+let voices = MediaSFUKmpTranslationVoiceSession(host: bridge)
+// Present inside your app's SwiftUI sheet or navigation flow.
+MediaSFUTranslationVoicePicker(session: voices, outputLanguage: "fr")
+```
+
+Enable spoken translation in the hosted room settings first. The picker fetches
+voices through that room's authenticated socket. It displays returned names,
+genders (including neutral), provider and model metadata, and submits the exact
+selected `voiceId` together with `ttsProvider`. It never invents IDs or includes
+provider credentials. The server remains authoritative for room permissions and
+voice compatibility. A successful submission is not an audio-playback receipt.
+
+Requests are cancellable and bounded to 20 seconds. Empty, malformed,
+unavailable, unsupported-schema and wrong-language catalogues cannot authorize
+a selection. Room, connection, output-language, translation configuration and
+mode changes invalidate pending requests and selections. Closing the sheet
+cancels its request. Basic preference and application-provided clone behavior
+remain in the hosted translation settings.
+
+For a custom native UI, use `MediaSFUTranslationVoicePickerModel` and its
+`load`, `select`, `canApply`, `apply`, `refreshContext` and `cancel` methods on the
+main actor. Call `refreshContext` while visible to refresh invalidated UI state;
+`apply` also checks context synchronously. The
+[translation sample](Examples/TranslationVoices/README.md) demonstrates the
+complete room/picker wiring.
+
+Native compilation, Swift linkage, simulator execution and physical-device
+audio are separate validation steps. Simulator tests do not establish audible
+translated output on a physical iPhone.

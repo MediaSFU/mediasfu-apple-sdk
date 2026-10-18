@@ -53,6 +53,7 @@ let package = Package(
                 )
             ],
             swiftSettings: [
+                .define("MEDIA_SFU_HAS_TRANSLATION_VOICES", .when(platforms: [.iOS])),
                 .define("MEDIA_SFU_HAS_MEDIASOUP_CLIENT", .when(platforms: [.iOS]))
             ]
         ),
@@ -62,6 +63,7 @@ let package = Package(
                 "MediaSFUAppleSDK"
             ],
             swiftSettings: [
+                .define("MEDIA_SFU_HAS_TRANSLATION_VOICES", .when(platforms: [.iOS])),
                 .define("MEDIA_SFU_HAS_MEDIASOUP_CLIENT", .when(platforms: [.iOS]))
             ]
         )
