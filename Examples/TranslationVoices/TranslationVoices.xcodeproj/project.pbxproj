@@ -8,10 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		0F8133F2A8C4B34E4CF29B7B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8EF73A2A8A57FD32A86F36E /* Foundation.framework */; };
+		231581BCAC2AB6BEC4CD2315 /* TranslationVoicesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3681233C85E4254420BC7C8 /* TranslationVoicesUITests.swift */; };
+		2EC68AD75B7581DFBE6BED45 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F8EF73A2A8A57FD32A86F36E /* Foundation.framework */; };
 		496A68274D690BE90EE0A97C /* TranslationVoicesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8C05887327FAAE76262A8D /* TranslationVoicesApp.swift */; };
 		CB4F8CA8543614B7A5C2C2E0 /* MediaSFUAppleSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 6B1ACBF22FCD30D788CA2D13 /* MediaSFUAppleSDK */; };
 		DC7D622211D783EB5BA93C93 /* MediaSFUAppleSDK in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 6B1ACBF22FCD30D788CA2D13 /* MediaSFUAppleSDK */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		79808D1570BFBE295F873295 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E930DE57BC0F93B4D0B9890C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 050D90CA591B536A1FBFFAD9;
+			remoteInfo = TranslationVoices;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		E6C524234A9120E3A09C65B6 /* Embed Frameworks */ = {
@@ -30,10 +42,20 @@
 /* Begin PBXFileReference section */
 		34FB79BF2868C090DDEAAB52 /* TranslationVoices.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TranslationVoices.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B8C05887327FAAE76262A8D /* TranslationVoicesApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TranslationVoicesApp.swift; sourceTree = "<group>"; };
+		916693F59E304395C1FC9274 /* TranslationVoicesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TranslationVoicesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3681233C85E4254420BC7C8 /* TranslationVoicesUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TranslationVoicesUITests.swift; sourceTree = "<group>"; };
 		F8EF73A2A8A57FD32A86F36E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		17440A6423CD2160D90DF0DB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2EC68AD75B7581DFBE6BED45 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F085ADE7858BCD104B9C00DB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -50,6 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				34FB79BF2868C090DDEAAB52 /* TranslationVoices.app */,
+				916693F59E304395C1FC9274 /* TranslationVoicesUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,6 +91,7 @@
 				10B2636BFE6E83AA64605D50 /* Products */,
 				DD3D8DB065D025A17B875AEC /* Frameworks */,
 				8B8C05887327FAAE76262A8D /* TranslationVoicesApp.swift */,
+				D3681233C85E4254420BC7C8 /* TranslationVoicesUITests.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -104,6 +128,24 @@
 			productReference = 34FB79BF2868C090DDEAAB52 /* TranslationVoices.app */;
 			productType = "com.apple.product-type.application";
 		};
+		25110420FCBCD23F671BFE3D /* TranslationVoicesUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AC19F48485642CECA25DB509 /* Build configuration list for PBXNativeTarget "TranslationVoicesUITests" */;
+			buildPhases = (
+				08CCC1C2A0D299C041BD28B6 /* Sources */,
+				17440A6423CD2160D90DF0DB /* Frameworks */,
+				76A120451564F10FBF8AD1E0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				690C94C3ADD9251E0A4B46F3 /* PBXTargetDependency */,
+			);
+			name = TranslationVoicesUITests;
+			productName = TranslationVoicesUITests;
+			productReference = 916693F59E304395C1FC9274 /* TranslationVoicesUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -132,11 +174,19 @@
 			projectRoot = "";
 			targets = (
 				050D90CA591B536A1FBFFAD9 /* TranslationVoices */,
+				25110420FCBCD23F671BFE3D /* TranslationVoicesUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		76A120451564F10FBF8AD1E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E27AE84EDD2B1516C9B18B7C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -169,6 +219,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		08CCC1C2A0D299C041BD28B6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				231581BCAC2AB6BEC4CD2315 /* TranslationVoicesUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0CF1F5B604789DE4FF1FDF7F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -179,7 +237,31 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		690C94C3ADD9251E0A4B46F3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TranslationVoices;
+			target = 050D90CA591B536A1FBFFAD9 /* TranslationVoices */;
+			targetProxy = 79808D1570BFBE295F873295 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		59E6674ED41258446ADAFD54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mediasfu.TranslationVoicesSample.UITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = TranslationVoices;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		900FD0B5A85222C07647AE98 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -198,6 +280,20 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BF0BAB7A5F27D5F9CD81E3C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mediasfu.TranslationVoicesSample.UITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = TranslationVoices;
 			};
 			name = Debug;
 		};
@@ -346,6 +442,15 @@
 			buildConfigurations = (
 				E80B55936890590962356321 /* Debug */,
 				D47460765FC6A3A2702EC5DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AC19F48485642CECA25DB509 /* Build configuration list for PBXNativeTarget "TranslationVoicesUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				59E6674ED41258446ADAFD54 /* Release */,
+				BF0BAB7A5F27D5F9CD81E3C6 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

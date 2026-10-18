@@ -37,6 +37,16 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "25110420FCBCD23F671BFE3D"
+               BuildableName = "TranslationVoicesUITests.xctest"
+               BlueprintName = "TranslationVoicesUITests"
+               ReferencedContainer = "container:TranslationVoices.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

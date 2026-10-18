@@ -43,8 +43,20 @@ target.build_configurations.each do |config|
     'LD_RUNPATH_SEARCH_PATHS' => ['$(inherited)', '@executable_path/Frameworks']
   })
 end
+tests = project.new_target(:ui_test_bundle, 'TranslationVoicesUITests', :ios, '15.0')
+tests.add_dependency(target)
+tests.add_file_references([project.main_group.new_file('TranslationVoicesUITests.swift')])
+tests.build_configurations.each do |config|
+  config.build_settings.merge!({
+    'PRODUCT_BUNDLE_IDENTIFIER' => 'com.mediasfu.TranslationVoicesSample.UITests',
+    'SWIFT_VERSION' => '5.0', 'GENERATE_INFOPLIST_FILE' => 'YES',
+    'TEST_TARGET_NAME' => 'TranslationVoices',
+    'LD_RUNPATH_SEARCH_PATHS' => ['$(inherited)', '@executable_path/Frameworks', '@loader_path/Frameworks']
+  })
+end
 project.save
 scheme = Xcodeproj::XCScheme.new
 scheme.add_build_target(target)
+scheme.add_test_target(tests)
 scheme.set_launch_target(target)
 scheme.save_as(path, 'TranslationVoices', true)
