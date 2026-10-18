@@ -31,6 +31,11 @@ spoken translation in the hosted translation settings before opening
 select a voice and apply it. The server still validates the settings. **Configured
 voice** leaves basic preference and clone configuration in the hosted settings.
 
+The app target sets `CADisableMinimumFrameDurationOnPhone` to `YES` in its
+Info.plist, as required by the Compose-hosted room. Keep this setting
+when embedding the room in another app. Room identifiers, tokens and media links
+are entered without automatic capitalization or spelling correction.
+
 Use the room's exit control to leave and release its media. Simulator builds and
 unit tests do not establish physical-device translated audio acceptance.
 

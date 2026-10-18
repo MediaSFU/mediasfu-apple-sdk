@@ -85,6 +85,12 @@ Hosted UI is the easiest way to add video calling to your app. The SDK loads a f
 
 The hosted controller renders the maintained modern component tree from the room state it owns. This is the Apple equivalent of `ModernMediasfuGenericHead` in the React, React Native, Flutter, and Kotlin SDKs: the renderer does not create a second socket, transport set, or copy of room state.
 
+Set `CADisableMinimumFrameDurationOnPhone` to Boolean `true` in your app's
+Info.plist before mounting the Compose-hosted controller. If Xcode generates
+your plist, add a source plist containing this key and select it with the app
+target's `INFOPLIST_FILE` build setting, as the translation sample does.
+The Compose runtime checks this setting when the hosted view first opens.
+
 ### SwiftUI Integration
 
 Wrap the host controller in a SwiftUI `UIViewControllerRepresentable`:

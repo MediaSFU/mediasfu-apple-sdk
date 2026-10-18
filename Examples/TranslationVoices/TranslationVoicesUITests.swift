@@ -40,7 +40,7 @@ final class TranslationVoicesUITests: XCTestCase {
         for (field, key) in zip(fields, keys) {
             let element = field == "Room-scoped token" ? app.secureTextFields[field] : app.textFields[field]
             XCTAssertTrue(element.waitForExistence(timeout: 10))
-            element.tap()
+            element.doubleTap()
             element.typeText(environment[key]!)
         }
         app.buttons["Join room"].tap()
@@ -53,7 +53,7 @@ final class TranslationVoicesUITests: XCTestCase {
         voice.tap()
         XCTAssertEqual(voice.value as? String, "Selected")
         let language = app.textFields["Output language code"]
-        language.tap()
+        language.doubleTap()
         language.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 2) + "de")
         XCTAssertFalse(app.buttons["Apply voice"].isEnabled, "Changing output language must clear the stock selection.")
         let image = XCTAttachment(screenshot: app.screenshot())

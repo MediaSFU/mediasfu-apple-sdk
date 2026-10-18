@@ -71,9 +71,11 @@ struct TranslationVoicesApp: App {
                             Text("Obtain a room-scoped handoff from your application backend. Keep account and provider credentials on the server.")
                             TextField("Display name", text: $name)
                             TextField("Room name", text: $roomName)
+                                .textInputAutocapitalization(.never).disableAutocorrection(true)
                             SecureField("Room-scoped token", text: $token)
+                                .textInputAutocapitalization(.never).disableAutocorrection(true)
                             TextField("Room media link", text: $link)
-                                .keyboardType(.URL).textInputAutocapitalization(.never)
+                                .keyboardType(.URL).textInputAutocapitalization(.never).disableAutocorrection(true)
                             Button("Join room") { room.join(name: name, room: roomName, token: token, link: link) }
                                 .disabled([name, roomName, token, link].contains { $0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
                         }

@@ -52,6 +52,7 @@ target.build_configurations.each do |config|
     'SWIFT_VERSION' => '5.0', 'GENERATE_INFOPLIST_FILE' => 'YES',
     'INFOPLIST_KEY_NSCameraUsageDescription' => 'Publish video to your test room.',
     'INFOPLIST_KEY_NSMicrophoneUsageDescription' => 'Publish speech for translation in your test room.',
+    'INFOPLIST_FILE' => 'Info.plist',
     'INFOPLIST_KEY_UILaunchScreen_Generation' => 'YES',
     'TARGETED_DEVICE_FAMILY' => '1,2', 'ENABLE_USER_SCRIPT_SANDBOXING' => 'NO',
     'SUPPORTED_PLATFORMS' => 'iphoneos iphonesimulator',
